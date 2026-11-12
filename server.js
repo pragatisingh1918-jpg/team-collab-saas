@@ -1,6 +1,7 @@
 const db = require('./db');
 const express = require('express');
 const { router: authRouter, requireAuth } = require('./auth');
+const projectsRouter = require('./projects');
 
 const app = express();
 app.use(express.json());
@@ -14,6 +15,8 @@ app.use('/', authRouter);
 app.get('/me', requireAuth, (req, res) => {
   res.json(req.user);
 });
+
+app.use('/api', requireAuth, projectsRouter);
 
 app.listen(3000, (err) => {
   if (err) {
