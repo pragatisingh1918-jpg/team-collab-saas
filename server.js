@@ -18,10 +18,18 @@ app.get('/me', requireAuth, (req, res) => {
 
 app.use('/api', requireAuth, projectsRouter);
 
-app.listen(3000, (err) => {
-  if (err) {
-    console.error('Server start nahi hua:', err.message);
-    return;
-  }
+const server = app.listen(3000, () => {
   console.log('Server http://localhost:3000 pe chal raha hai');
+});
+
+server.on('error', (err) => {
+  console.error('Server error:', err.message);
+});
+
+process.on('exit', (code) => {
+  console.log('Node process band ho raha hai, code:', code);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught error:', err);
 });
