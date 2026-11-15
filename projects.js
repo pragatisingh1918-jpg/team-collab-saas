@@ -44,4 +44,45 @@ router.get('/projects/:projectId/tasks', (req, res) => {
   res.json(rows);
 });
 
+// Task ka status badalta hai (todo / in_progress / done)
+router.patch('/tasks/:id/status', (req, res) => {
+  const { status } = req.body;
+  if (!['todo', 'in_progress', 'done'].includes(status)) {
+    return res.status(400).json({ error: 'Status todo, in_progress ya done hona chahiye' });
+  }
+
+  // task meri hi company ka hona chahiye
+  const task = db
+    .prepare('SELECT id FROM tasks WHERE id = ? AND org_id = ?')
+    .get(req.params.id, req.user.org_id);
+  if (!task) return res.status(404).json({ error: 'Task nahi mila' });
+
+  const completedAt = status === 'done' ? new Date().toISOString() : null;
+  db.prepare('UPDATE tasks SET status = ?, completed_at = ? WHERE id = ?')
+    .run(status, completedAt, task.id);
+
+  res.json({ id: task.id, status });
+});
+
+// Dashboard ke numbers
+router.get('/stats', (req, res) => {
+  const orgId = req.user.org_id;
+  const count = (sql, ...args) => db.prepare(sql).get(...args).n;
+
+  const total = count('SELECT COUNT(*) AS n FROM tasks WHERE org_id = ?', orgId);
+  const done = count("SELECT COUNT(*) AS n FROM tasks WHERE org_id = ? AND status = 'done'", orgId);
+  const overdue = count(
+    "SELECT COUNT(*) AS n FROM tasks WHERE org_id = ? AND status != 'done' AND due_date IS NOT NULL AND due_date < ?",
+    orgId,
+    new Date().toISOString()
+  );
+
+  res.json({
+    total,
+    done,
+    overdue,
+    completion_percent: total === 0 ? 0 : Math.round((done / total) * 100),
+  });
+});
+
 module.exports = router;
