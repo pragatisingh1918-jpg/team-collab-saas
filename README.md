@@ -4,7 +4,7 @@ A web app where organizations plan projects, assign tasks and track progress on 
 
 > Built solo by Pragati as the Web Development Internship project (Project 2).
 
-**Demo video:** `https://youtu.be/IbjGt0rZ_jU`
+**Demo video:** https://youtu.be/IbjGt0rZ_jU
 
 ## Team contribution note
 This project was assigned to a group of five interns. I messaged the group to coordinate the work and received no response for about 2 to 3 weeks. I followed up again and still received no reply, so I planned, designed and built the entire project on my own. This covers the database schema, backend API, authentication and permissions, frontend, tests, seed data and documentation. The Git commit history shows that all commits are from my account.
